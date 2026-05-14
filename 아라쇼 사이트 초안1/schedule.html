@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>아라쇼 방송 편성표</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="style.css">
+<style>
+    /* =========================================
+       방송 편성표 전용 스타일
+    ========================================= */
+    .schedule-wrapper {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 60px 24px;
+    }
+
+    .schedule-page-title {
+        text-align: center;
+        font-size: 32px;
+        font-weight: 900;
+        color: #0f172a;
+        margin-bottom: 16px;
+    }
+
+    .schedule-page-subtitle {
+        text-align: center;
+        font-size: 16px;
+        color: #64748b;
+        margin-bottom: 60px;
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 40px;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        bottom: 0;
+        width: 4px;
+        background: #e2e8f0;
+        border-radius: 2px;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 40px;
+    }
+
+    .schedule-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .schedule-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 40px rgba(37, 99, 235, 0.1);
+        border-color: #cbd5e1;
+    }
+
+    .schedule-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 2px solid #f8fafc;
+        padding-bottom: 16px;
+        margin-bottom: 16px;
+    }
+
+    .schedule-date {
+        font-size: 22px;
+        font-weight: 800;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .schedule-date i.fa-calendar-check {
+        color: #2563eb;
+    }
+
+    .schedule-badge {
+        background: #fee2e2;
+        color: #dc2626;
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-weight: 800;
+        font-size: 15px;
+    }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .schedule-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 600px;
+    }
+
+    .schedule-table th, 
+    .schedule-table td {
+        padding: 14px 12px;
+        text-align: left;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 15px;
+        color: #334155;
+    }
+
+    .schedule-table th {
+        color: #64748b;
+        font-weight: 700;
+        background-color: #f8fafc;
+    }
+
+    .schedule-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .schedule-table .product-code {
+        font-family: 'Poppins', sans-serif;
+        color: #94a3b8;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .schedule-table .product-name {
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .schedule-table .discount {
+        color: #ef4444;
+        font-weight: 900;
+        font-size: 16px;
+    }
+
+    .btn-star {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #cbd5e1; 
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        padding: 0;
+        margin-left: 8px; 
+    }
+    .btn-star:hover { transform: scale(1.15); }
+    .btn-star.active { color: #eab308; animation: starPop 0.3s ease-out; }
+    
+    @keyframes starPop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.3); }
+        100% { transform: scale(1); }
+    }
+
+    /* ✨ 커스텀 모달(알림창) 스타일 추가 */
+    .custom-modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(15, 23, 42, 0.6);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .custom-modal.active {
+        display: flex;
+        opacity: 1;
+    }
+    .modal-content {
+        background: #fff;
+        border-radius: 24px;
+        padding: 30px;
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+    }
+    .custom-modal.active .modal-content {
+        transform: translateY(0);
+    }
+    .modal-icon {
+        font-size: 40px;
+        color: #2563eb;
+        margin-bottom: 16px;
+    }
+    .modal-content h3 {
+        font-size: 20px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 12px;
+    }
+    .modal-content p {
+        font-size: 15px;
+        color: #64748b;
+        line-height: 1.6;
+        margin-bottom: 24px;
+        word-break: keep-all;
+    }
+    .modal-content .highlight-text {
+        color: #ef4444; /* 강조색 (빨간색) */
+        font-weight: 800;
+        font-size: 16px;
+        display: block;
+        margin-bottom: 4px;
+    }
+    .modal-actions {
+        display: flex;
+        gap: 12px;
+    }
+    .modal-actions button {
+        flex: 1;
+        padding: 14px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .btn-cancel { background: #f1f5f9; color: #64748b; }
+    .btn-cancel:hover { background: #e2e8f0; }
+    .btn-confirm { background: #2563eb; color: #fff; }
+    .btn-confirm:hover { background: #1d4ed8; }
+
+    /* 모바일 반응형 */
+    @media (max-width: 768px) {
+        .schedule-wrapper { padding: 40px 16px; }
+        .timeline { padding-left: 20px; }
+        .timeline::before { left: 0; }
+        .schedule-card { padding: 20px; }
+        .schedule-date { font-size: 18px; }
+        .btn-star { font-size: 20px; }
+        .schedule-badge { font-size: 13px; padding: 6px 12px; }
+        .schedule-table th, .schedule-table td { font-size: 13px; padding: 10px 8px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+    <header class="header">
+        <div class="logo-wrap">
+            <a href="index.html">
+                <img class="logo-image" src="아라쇼로고.png" alt="아라쇼" />
+            </a>
+        </div>
+<ul class="nav-menu">
+    <li><a href="index.html"><i class="fa-solid fa-circle" style="font-size: 10px; color: #ef4444; margin-right: 4px;"></i>LIVE</a></li>
+    <li class="active"><a href="schedule.html">방송 편성표</a></li>
+    <li><a href="highlight.html">하이라이트</a></li>
+    <li><a href="product-info.html">상품정보영상</a></li>
+    <li><a href="community.html">커뮤니티</a></li>
+    <li><a href="vsindex.html">V스튜디오</a></li>
+</ul>
+        <div class="header-icons">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <i class="fa-solid fa-cart-shopping"></i>
+            <a href="login.html" style="color: inherit;"><i class="fa-regular fa-user"></i></a>
+        </div>
+    </header>
+
+    <main class="schedule-wrapper">
+        <h1 class="schedule-page-title">2026년 5월 라이브 편성표</h1>
+        <p class="schedule-page-subtitle">매주 다양한 테마로 진행되는 아라쇼만의 파격 특가를 놓치지 마세요!</p>
+
+        <div class="timeline">
+            
+            <div class="timeline-item">
+                <div class="schedule-card">
+                    <div class="schedule-card-header">
+                        <div class="schedule-date">
+                            <i class="fa-regular fa-calendar-check"></i> 5월 4일 (월) 
+                            <button class="btn-star" title="알림 받기"><i class="fa-regular fa-star"></i></button>
+                        </div>
+                        <div class="schedule-badge">핸디분무DAY</div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>상품코드</th>
+                                    <th>상품명</th>
+                                    <th>규격</th>
+                                    <th>브랜드</th>
+                                    <th>할인율</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="product-code">562065</td>
+                                    <td class="product-name">압축분무기 핸디형</td>
+                                    <td>1.5L 롱/숏/폼 노즐 포함</td>
+                                    <td>비츠온</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">562063</td>
+                                    <td class="product-name">압축분무기 핸디형</td>
+                                    <td>1L</td>
+                                    <td>비츠온</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">562066</td>
+                                    <td class="product-name">압축분무기 핸디형</td>
+                                    <td>2L 롱/숏/폼 노즐 포함</td>
+                                    <td>비츠온</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">562064</td>
+                                    <td class="product-name">압축분무기 핸디형</td>
+                                    <td>2L 롱노즐만</td>
+                                    <td>비츠온</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="schedule-card">
+                    <div class="schedule-card-header">
+                        <div class="schedule-date">
+                            <i class="fa-regular fa-calendar-check"></i> 5월 6일 (수)
+                            <button class="btn-star" title="알림 받기"><i class="fa-regular fa-star"></i></button>
+                        </div>
+                        <div class="schedule-badge">고용량DAY</div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>상품코드</th>
+                                    <th>상품명</th>
+                                    <th>규격</th>
+                                    <th>브랜드</th>
+                                    <th>할인율</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="product-code">556341</td>
+                                    <td class="product-name">멀티코드 고용량(누전)</td>
+                                    <td>2구 (2호) 1.5M 16A KS</td>
+                                    <td>비츠온MRO</td>
+                                    <td class="discount">9%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">556342</td>
+                                    <td class="product-name">멀티코드 고용량(누전)</td>
+                                    <td>2구 (3호) 3M 16A KS</td>
+                                    <td>비츠온MRO</td>
+                                    <td class="discount">9%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="schedule-card">
+                    <div class="schedule-card-header">
+                        <div class="schedule-date">
+                            <i class="fa-regular fa-calendar-check"></i> 5월 8일 (금)
+                            <button class="btn-star" title="알림 받기"><i class="fa-regular fa-star"></i></button>
+                        </div>
+                        <div class="schedule-badge">흙손DAY</div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>상품코드</th>
+                                    <th>상품명</th>
+                                    <th>규격</th>
+                                    <th>브랜드</th>
+                                    <th>할인율</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="product-code">66368</td>
+                                    <td class="product-name">흙손</td>
+                                    <td>삼각 6(150mm) THT82616</td>
+                                    <td>TOTAL</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">66369</td>
+                                    <td class="product-name">흙손</td>
+                                    <td>삼각 8(200mm) 고급형 THT82816</td>
+                                    <td>TOTAL</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">286803</td>
+                                    <td class="product-name">흙손(고무)</td>
+                                    <td>230*100mm THT8320106</td>
+                                    <td>TOTAL</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">286804</td>
+                                    <td class="product-name">흙손(고무)</td>
+                                    <td>240*100mm THT8324106</td>
+                                    <td>TOTAL</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="schedule-card">
+                    <div class="schedule-card-header">
+                        <div class="schedule-date">
+                            <i class="fa-regular fa-calendar-check"></i> 5월 11일 (월)
+                            <button class="btn-star" title="알림 받기"><i class="fa-regular fa-star"></i></button>
+                        </div>
+                        <div class="schedule-badge">아크DAY</div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>상품코드</th>
+                                    <th>상품명</th>
+                                    <th>규격</th>
+                                    <th>브랜드</th>
+                                    <th>할인율</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="product-code">566414</td>
+                                    <td class="product-name">아크 누전차단기 산업용 TBE-32ac</td>
+                                    <td>2P 20A 2.5KA</td>
+                                    <td>태성</td>
+                                    <td class="discount">4%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">566415</td>
+                                    <td class="product-name">아크 누전차단기 산업용 TBE-32ac</td>
+                                    <td>2P 30A 2.5KA</td>
+                                    <td>태성</td>
+                                    <td class="discount">4%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="schedule-card">
+                    <div class="schedule-card-header">
+                        <div class="schedule-date">
+                            <i class="fa-regular fa-calendar-check"></i> 5월 13일 (수)
+                            <button class="btn-star" title="알림 받기"><i class="fa-regular fa-star"></i></button>
+                        </div>
+                        <div class="schedule-badge">AL몰딩DAY</div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>상품코드</th>
+                                    <th>상품명</th>
+                                    <th>규격</th>
+                                    <th>브랜드</th>
+                                    <th>할인율</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="product-code">19889</td>
+                                    <td class="product-name">몰딩AL</td>
+                                    <td>2호 ★</td>
+                                    <td>조은몰드</td>
+                                    <td class="discount">5%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">19890</td>
+                                    <td class="product-name">몰딩AL</td>
+                                    <td>3호 ★</td>
+                                    <td>조은몰드</td>
+                                    <td class="discount">5%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">19891</td>
+                                    <td class="product-name">몰딩AL</td>
+                                    <td>4호 ★</td>
+                                    <td>조은몰드</td>
+                                    <td class="discount">5%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">19892</td>
+                                    <td class="product-name">몰딩AL</td>
+                                    <td>5호 ★</td>
+                                    <td>조은몰드</td>
+                                    <td class="discount">5%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="schedule-card">
+                    <div class="schedule-card-header">
+                        <div class="schedule-date">
+                            <i class="fa-regular fa-calendar-check"></i> 5월 15일 (금)
+                            <button class="btn-star" title="알림 받기"><i class="fa-regular fa-star"></i></button>
+                        </div>
+                        <div class="schedule-badge">압축DAY</div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>상품코드</th>
+                                    <th>상품명</th>
+                                    <th>규격</th>
+                                    <th>브랜드</th>
+                                    <th>할인율</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="product-code">562059</td>
+                                    <td class="product-name">압축분무기 배낭형</td>
+                                    <td>20L</td>
+                                    <td>비츠온</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">562056</td>
+                                    <td class="product-name">압축분무기 어깨걸이형</td>
+                                    <td>3L</td>
+                                    <td>비츠온</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">562057</td>
+                                    <td class="product-name">압축분무기 어깨걸이형</td>
+                                    <td>5L</td>
+                                    <td>비츠온</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">562058</td>
+                                    <td class="product-name">압축분무기 어깨걸이형</td>
+                                    <td>7L</td>
+                                    <td>비츠온</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="schedule-card">
+                    <div class="schedule-card-header">
+                        <div class="schedule-date">
+                            <i class="fa-regular fa-calendar-check"></i> 5월 18일 (월)
+                            <button class="btn-star" title="알림 받기"><i class="fa-regular fa-star"></i></button>
+                        </div>
+                        <div class="schedule-badge">일회용DAY</div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>상품코드</th>
+                                    <th>상품명</th>
+                                    <th>규격</th>
+                                    <th>브랜드</th>
+                                    <th>할인율</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="product-code">536486</td>
+                                    <td class="product-name">일회용우의(롱타입 자켓)</td>
+                                    <td>백색Free 일회용TR</td>
+                                    <td>비츠온</td>
+                                    <td class="discount">5%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">536487</td>
+                                    <td class="product-name">일회용우의(롱타입 자켓)</td>
+                                    <td>청색Free 일회용TR</td>
+                                    <td>비츠온</td>
+                                    <td class="discount">5%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">536488</td>
+                                    <td class="product-name">일회용우의(롱타입 자켓)</td>
+                                    <td>황색Free 일회용TR</td>
+                                    <td>비츠온</td>
+                                    <td class="discount">5%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="schedule-card">
+                    <div class="schedule-card-header">
+                        <div class="schedule-date">
+                            <i class="fa-regular fa-calendar-check"></i> 5월 20일 (수)
+                            <button class="btn-star" title="알림 받기"><i class="fa-regular fa-star"></i></button>
+                        </div>
+                        <div class="schedule-badge">덕테이프DAY</div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>상품코드</th>
+                                    <th>상품명</th>
+                                    <th>규격</th>
+                                    <th>브랜드</th>
+                                    <th>할인율</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="product-code">468252</td>
+                                    <td class="product-name">덕테이프 맥스</td>
+                                    <td>48mm x 18m (20)블랙</td>
+                                    <td>덕테이프</td>
+                                    <td class="discount">5%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">468253</td>
+                                    <td class="product-name">덕테이프 맥스</td>
+                                    <td>48mm x 18m (20)화이트</td>
+                                    <td>덕테이프</td>
+                                    <td class="discount">5%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">468246</td>
+                                    <td class="product-name">덕테이프 오리지널</td>
+                                    <td>48mm x 9m (10)</td>
+                                    <td>덕테이프</td>
+                                    <td class="discount">5%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="schedule-card">
+                    <div class="schedule-card-header">
+                        <div class="schedule-date">
+                            <i class="fa-regular fa-calendar-check"></i> 5월 22일 (금)
+                            <button class="btn-star" title="알림 받기"><i class="fa-regular fa-star"></i></button>
+                        </div>
+                        <div class="schedule-badge">파티DAY</div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>상품코드</th>
+                                    <th>상품명</th>
+                                    <th>규격</th>
+                                    <th>브랜드</th>
+                                    <th>할인율</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="product-code">382599</td>
+                                    <td class="product-name">파티조명(흑색)</td>
+                                    <td>10M 10분기 흑색</td>
+                                    <td>태양</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">382600</td>
+                                    <td class="product-name">파티조명(흑색)</td>
+                                    <td>12.5M 15분기 흑색</td>
+                                    <td>태양</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">382601</td>
+                                    <td class="product-name">파티조명(흑색)</td>
+                                    <td>15M 20분기 흑색</td>
+                                    <td>태양</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">382602</td>
+                                    <td class="product-name">파티조명(흑색)</td>
+                                    <td>20M 30분기 흑색</td>
+                                    <td>태양</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="schedule-card">
+                    <div class="schedule-card-header">
+                        <div class="schedule-date">
+                            <i class="fa-regular fa-calendar-check"></i> 5월 27일 (수)
+                            <button class="btn-star" title="알림 받기"><i class="fa-regular fa-star"></i></button>
+                        </div>
+                        <div class="schedule-badge">순치기DAY</div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>상품코드</th>
+                                    <th>상품명</th>
+                                    <th>규격</th>
+                                    <th>브랜드</th>
+                                    <th>할인율</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="product-code">526755</td>
+                                    <td class="product-name">순치기가위</td>
+                                    <td>S-510</td>
+                                    <td>화신</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">526756</td>
+                                    <td class="product-name">순치기가위</td>
+                                    <td>S-520</td>
+                                    <td>화신</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">526757</td>
+                                    <td class="product-name">순치기가위</td>
+                                    <td>S-540</td>
+                                    <td>화신</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">526758</td>
+                                    <td class="product-name">순치기가위</td>
+                                    <td>S-560</td>
+                                    <td>화신</td>
+                                    <td class="discount">11%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="schedule-card">
+                    <div class="schedule-card-header">
+                        <div class="schedule-date">
+                            <i class="fa-regular fa-calendar-check"></i> 5월 29일 (금)
+                            <button class="btn-star" title="알림 받기"><i class="fa-regular fa-star"></i></button>
+                        </div>
+                        <div class="schedule-badge">우신DAY</div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>상품코드</th>
+                                    <th>상품명</th>
+                                    <th>규격</th>
+                                    <th>브랜드</th>
+                                    <th>할인율</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="product-code">68113</td>
+                                    <td class="product-name">랜턴 LED(헤드용)</td>
+                                    <td>WS-07H 왕7구 LED</td>
+                                    <td>우신</td>
+                                    <td class="discount">9%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">18305</td>
+                                    <td class="product-name">포켓 다용도 멀티툴</td>
+                                    <td>WS-K08</td>
+                                    <td>우신</td>
+                                    <td class="discount">5%</td>
+                                </tr>
+                                <tr>
+                                    <td class="product-code">18300</td>
+                                    <td class="product-name">포켓 주먹나이프</td>
+                                    <td>WS-K03</td>
+                                    <td>우신</td>
+                                    <td class="discount">5%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+</div>
+
+<!-- ✨ 알림 모달창 HTML 추가 -->
+<div class="custom-modal" id="notificationModal">
+    <div class="modal-content">
+        <div class="modal-icon"><i class="fa-regular fa-bell"></i></div>
+        <h3>알림 설정</h3>
+        <p id="modalMessage">해당 방송을 알림 설정하시겠습니까?</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" id="modalBtnCancel">취소</button>
+            <button class="btn-confirm" id="modalBtnConfirm">알림 받기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // ✨ 별표(즐겨찾기) 커스텀 모달 토글 로직
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const starButtons = document.querySelectorAll('.btn-star');
+        const modal = document.getElementById('notificationModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const btnCancel = document.getElementById('modalBtnCancel');
+        const btnConfirm = document.getElementById('modalBtnConfirm');
+
+        let currentButton = null; // 현재 클릭된 별 버튼을 기억하기 위한 변수
+
+        starButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+
+                // 이미 활성화(노란색) 상태인 경우 -> 바로 해제 (모달 띄우지 않음)
+                if (this.classList.contains('active')) {
+                    this.classList.remove('active');
+                    icon.classList.remove('fa-solid'); 
+                    icon.classList.add('fa-regular');  
+                } 
+                // 비활성화(빈 별) 상태인 경우 -> 정보 읽어와서 모달 띄우기
+                else {
+                    // 1. 카드의 헤더 영역 찾기
+                    const cardHeader = this.closest('.schedule-card-header');
+                    
+                    // 2. 날짜 텍스트 추출 (아이콘 태그 등 불필요한 요소 제거하고 순수 텍스트만)
+                    const dateElement = cardHeader.querySelector('.schedule-date').cloneNode(true);
+                    dateElement.querySelectorAll('i, button').forEach(el => el.remove());
+                    const dateText = dateElement.textContent.trim();
+                    
+                    // 3. 방송 배지 이름(ㅇㅇㅇDAY) 추출
+                    const badgeText = cardHeader.querySelector('.schedule-badge').innerText;
+
+                    // 4. 모달창 메시지 세팅
+                    modalMessage.innerHTML = `<span class="highlight-text">[${dateText} ${badgeText}]</span>방송을 ISVM 팝업으로 알림을 받아보시겠습니까?`;
+
+                    // 5. 현재 버튼 기억하고 모달 띄우기
+                    currentButton = this;
+                    modal.classList.add('active');
+                }
+            });
+        });
+
+        // 모달창 닫기 함수
+        function closeModal() {
+            modal.classList.remove('active');
+            currentButton = null;
+        }
+
+        // '취소' 버튼 클릭 시
+        btnCancel.addEventListener('click', closeModal);
+
+        // '알림 받기' 버튼 클릭 시
+        btnConfirm.addEventListener('click', function() {
+            if (currentButton) {
+                const icon = currentButton.querySelector('i');
+                currentButton.classList.add('active');
+                icon.classList.remove('fa-regular');
+                icon.classList.add('fa-solid');
+            }
+            closeModal();
+        });
+    });
+</script>
+</body>
+</html>

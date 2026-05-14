@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>아라쇼 (ARA-SHOW)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="style.css">
+<style>
+    .chat-messages { padding: 15px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .msg { font-size: 14px; line-height: 1.5; color: #334155; word-break: break-all; animation: fadeIn 0.3s ease-out; }
+    .msg strong { color: #0f172a; margin-right: 4px; }
+    .msg.admin strong { color: #2563eb; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .countdown-badge { margin-left: 12px; background: #ef4444; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; }
+    
+    /* ✨ 특가 할인 타이머 스타일 (빨간색) */
+    .discount-timer {
+        background: #ef4444;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: 'Poppins', 'Noto Sans KR', sans-serif;
+        letter-spacing: 0.5px;
+    }
+    .discount-timer.expired {
+        background: #94a3b8; /* 특가 종료 시 회색으로 변경 */
+    }
+
+    @keyframes blinkRed { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+    .live-dot.active { background: #ef4444; animation: blinkRed 1.5s infinite; }
+    .live-dot.past { background: #94a3b8; animation: none; }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+<header class="header">
+    <!-- ✨ 로고 클릭 시 메인으로 이동 (넷리파이 호환) -->
+    <div class="logo-wrap"><a href="/"><img class="logo-image" src="아라쇼로고.png" alt="아라쇼" /></a></div>
+    <ul class="nav-menu">
+        <!-- ✨ LIVE 클릭 시 메인으로 이동 (넷리파이 호환) -->
+        <li class="active"><a href="/"><i class="fa-solid fa-circle" style="font-size: 10px; color: #ef4444; margin-right: 4px;"></i>LIVE</a></li>
+        <li><a href="schedule.html">방송 편성표</a></li>
+        <li><a href="highlight.html">하이라이트</a></li>
+        <li><a href="product-info.html">상품정보영상</a></li>
+        <li><a href="community.html">커뮤니티</a></li>
+        <li><a href="vsindex.html">V스튜디오</a></li>
+    </ul>
+    <div class="header-icons">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <i class="fa-solid fa-cart-shopping"></i>
+        <a href="login.html" style="color: inherit;"><i class="fa-regular fa-user"></i></a>
+    </div>
+</header>
+
+<div class="main-layout fluid-layout">
+    <div class="live-area">
+        <div class="live-top">
+            <div class="live-title" style="display: flex; align-items: center;">
+                <div class="live-dot" id="liveDot"></div>
+                <span id="liveStatusText" style="font-weight: 800; font-family: 'Poppins', sans-serif;">상태 확인 중...</span>
+                <div class="countdown-badge" id="countdownTimer" style="display: none;">
+                    <i class="fa-regular fa-clock"></i> 00:00:00
+                </div>
+            </div>
+            <div class="viewer-box" id="viewerBox"><i class="fa-solid fa-eye"></i><span id="viewerCount">-</span>명</div>
+        </div>
+        <div class="player-wrap">
+            <iframe id="youtubePlayer" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen src="https://www.youtube.com/embed/GedRIm9lG_M?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1&controls=1"></iframe>
+        </div>
+        <div class="product-section">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px;">
+                <div class="product-title" style="margin-bottom: 0;">오늘의 LIVE 특가</div>
+                <div class="discount-timer" id="discountTimer">
+                    <i class="fa-solid fa-hourglass-half"></i> 남은 시간 00:00:00
+                </div>
+            </div>
+            
+            <div class="product-grid">
+                <!-- 상품 1 -->
+                <a class="product-card" href="https://isvm.co.kr/front/shop/productDetail.do?productCode=569522" target="_blank">
+                    <div class="product-thumb"><div class="live-badge">LIVE 특가</div><img src="https://vitsonimg.co.kr/images/productsNew/569/569522.JPG" alt="실외기 받침대 이미지"></div>
+                    <div class="product-info"><h4>실외기 받침대</h4><div class="product-code">상품코드: 569522</div><div class="product-spec">규격: 150*125*430 (1SET=2EA)</div><div class="product-price">5% 할인</div><button class="buy-btn">구매하기</button></div>
+                </a>
+                <!-- 상품 2 -->
+                <a class="product-card" href="https://isvm.co.kr/front/shop/productDetail.do?productCode=569523" target="_blank">
+                    <div class="product-thumb"><div class="live-badge">LIVE 특가</div><img src="https://vitsonimg.co.kr/images/productsNew/569/569523.JPG" alt="실외기 받침대 이미지"></div>
+                    <div class="product-info"><h4>실외기 받침대</h4><div class="product-code">상품코드: 569523</div><div class="product-spec">규격: 150*125*520 (1SET=2EA)</div><div class="product-price">5% 할인</div><button class="buy-btn">구매하기</button></div>
+                </a>
+                <!-- 상품 3 -->
+                <a class="product-card" href="https://isvm.co.kr/front/shop/productDetail.do?productCode=569524" target="_blank">
+                    <div class="product-thumb"><div class="live-badge">LIVE 특가</div><img src="https://vitsonimg.co.kr/images/productsNew/569/569524.JPG" alt="실외기 받침대 이미지"></div>
+                    <div class="product-info"><h4>실외기 받침대</h4><div class="product-code">상품코드: 569524</div><div class="product-spec">규격: 150*125*730 (1SET=2EA)</div><div class="product-price">5% 할인</div><button class="buy-btn">구매하기</button></div>
+                </a>
+                <!-- 상품 4 -->
+                <a class="product-card" href="https://isvm.co.kr/front/shop/productDetail.do?productCode=562066" target="_blank">
+                    <div class="product-thumb"><div class="live-badge">LIVE 특가</div><img src="https://vitsonimg.co.kr/images/productsNew/562/562066%20%EB%B9%84%EC%B8%A0%EC%98%A8%20%EC%95%95%EC%B6%95%EB%B6%84%EB%AC%B4%EA%B8%B0%20%ED%95%B8%EB%94%94%ED%98%95_7-1.jpg" alt="압축분무기 핸디형 이미지"></div>
+                    <div class="product-info"><h4>압축분무기 핸디형</h4><div class="product-code">상품코드: 562066</div><div class="product-spec">규격: 2L 롱/숏/폼 노즐 포함</div><div class="product-price">11% 할인</div><button class="buy-btn">구매하기</button></div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="right-area">
+        <div class="chat-wrap">
+            <div class="chat-header">실시간 채팅<div class="chat-live">LIVE CHAT</div></div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="msg admin"><strong>[아라쇼]</strong> 실시간 채팅에 오신 것을 환영합니다!</div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="채팅을 입력하세요">
+                <button id="sendBtn">전송</button>
+            </div>
+        </div>
+        <div class="side-banner small-banner" id="bannerSlider">
+            <a href="#"><img src="우측배너.png" class="banner-img active" alt="배너 1"><img src="우측배너1.png" class="banner-img" alt="배너 2"></a>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    // 본인의 API 키
+    const firebaseConfig = {
+        apiKey: "AIzaSyCFhPO1Ttt1mZJ2DWU5R6yuLx3r9_L7mPI",
+        authDomain: "isvmlivepage.firebaseapp.com",
+        projectId: "isvmlivepage",
+        storageBucket: "isvmlivepage.firebasestorage.app",
+        messagingSenderId: "447061552997",
+        appId: "1:447061552997:web:d5b4fd5d148e93b81e7b8c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // ==========================================
+    // 실시간 채팅 연동
+    // ==========================================
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const chatMessages = document.getElementById('chatMessages');
+
+    async function sendMessage() {
+        const text = chatInput.value.trim();
+        if (!text) return; 
+
+        chatInput.value = '';
+        chatInput.focus();
+
+        try {
+            await addDoc(collection(db, "chats"), {
+                user: "방문자",
+                text: text,
+                createdAt: serverTimestamp() 
+            });
+        } catch (e) {
+            console.error("채팅 전송 실패:", e);
+        }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.isComposing) {
+            e.preventDefault(); 
+            sendMessage();
+        }
+    });
+
+    const q = query(collection(db, "chats"), orderBy("createdAt", "asc"));
+    onSnapshot(q, (snapshot) => {
+        chatMessages.innerHTML = `<div class="msg admin"><strong>[아라쇼]</strong> 실시간 채팅에 오신 것을 환영합니다!</div>`;
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'msg user';
+            msgDiv.innerHTML = `<strong>${data.user}</strong> ${data.text}`;
+            chatMessages.appendChild(msgDiv);
+        });
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+
+    // ==========================================
+    // 시청자 수 제어 및 메인 방송 상태 타이머 UI
+    // ==========================================
+    let isLive = false; 
+    let viewerInterval;
+    let timerInterval;
+
+    function updateLiveUI(isLiveStatus) {
+        const liveDot = document.getElementById('liveDot');
+        const liveStatusText = document.getElementById('liveStatusText');
+        const countdownTimer = document.getElementById('countdownTimer');
+        const viewerBox = document.getElementById('viewerBox');
+
+        clearInterval(viewerInterval);
+        clearInterval(timerInterval);
+
+        if (isLiveStatus) {
+            liveStatusText.innerText = '현재 방송 중';
+            liveStatusText.style.color = '#ef4444';
+            liveDot.className = 'live-dot active';
+            countdownTimer.style.display = 'none'; 
+            viewerBox.innerHTML = '<i class="fa-solid fa-eye"></i> <span id="viewerCount">-</span>명';
+            
+            let cycleStep = 0;
+            let apiViewerCount = 1200; 
+            let localViewerCount = 34; 
+            let realTotalCount = apiViewerCount + localViewerCount; 
+            
+            document.getElementById('viewerCount').innerText = realTotalCount.toLocaleString();
+
+            viewerInterval = setInterval(() => {
+                cycleStep++;
+                if (cycleStep === 3) {
+                    document.getElementById('viewerCount').innerText = realTotalCount.toLocaleString();
+                    cycleStep = 0; 
+                } else {
+                    const randomChange = Math.floor(Math.random() * 21) - 5;
+                    document.getElementById('viewerCount').innerText = (realTotalCount + randomChange).toLocaleString();
+                }
+            }, 3000); 
+
+        } else {
+            liveStatusText.innerText = '다음 방송까지';
+            liveStatusText.style.color = '#64748b';
+            liveDot.className = 'live-dot past';
+            countdownTimer.style.display = 'inline-flex'; 
+            viewerBox.innerHTML = '<i class="fa-solid fa-play"></i> <span>지난 방송</span>'; 
+            
+            startNextBroadcastTimer(); 
+        }
+    }
+
+    function startNextBroadcastTimer() {
+        const targetDate = new Date("2026-05-04T10:00:00").getTime(); 
+        const timerEl = document.getElementById("countdownTimer");
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const dist = targetDate - now;
+
+            if (dist <= 0) {
+                timerEl.innerHTML = '<i class="fa-solid fa-tower-broadcast"></i> 곧 방송이 시작됩니다!';
+                timerEl.style.background = '#2563eb'; 
+                clearInterval(timerInterval);
+                return;
+            }
+
+            const days = Math.floor(dist / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((dist % (1000 * 60)) / 1000);
+
+            let timeStr = "";
+            if (days > 0) timeStr += `${days}일 `;
+            timeStr += `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+            timerEl.innerHTML = `<i class="fa-regular fa-clock"></i> ${timeStr}`;
+        }
+
+        timerInterval = setInterval(updateTimer, 1000);
+        updateTimer(); 
+    }
+
+    updateLiveUI(isLive);
+
+    // ==========================================
+    // ✨ 특가 할인 마감 카운트다운 타이머
+    // ==========================================
+    function startDiscountTimer() {
+        // 목표 시간: 2026년 4월 30일 23:59:59
+        const targetDate = new Date("2026-04-30T23:59:59").getTime(); 
+        const timerEl = document.getElementById("discountTimer");
+        let discountInterval;
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const dist = targetDate - now;
+
+            // 시간이 다 지났을 때
+            if (dist <= 0) {
+                timerEl.innerHTML = '특가종료';
+                timerEl.classList.add('expired'); // 회색으로 변경
+                clearInterval(discountInterval);
+                return;
+            }
+
+            const hours = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((dist % (1000 * 60)) / 1000);
+
+            // 두 자리 수로 포맷팅 (예: 09:05:02)
+            const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+            timerEl.innerHTML = `<i class="fa-solid fa-hourglass-half"></i> 남은 시간 ${timeStr}`;
+        }
+
+        discountInterval = setInterval(updateTimer, 1000);
+        updateTimer(); 
+    }
+
+    // 타이머 시작!
+    startDiscountTimer();
+
+</script>
+</body>
+</html>

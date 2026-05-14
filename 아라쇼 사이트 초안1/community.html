@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>아라쇼 커뮤니티</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="style.css">
+<style>
+    .community-wrapper { width: 100%; max-width: 800px; margin: 0 auto; padding: 50px 24px 80px; }
+    .comm-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; }
+    .comm-title h1 { font-size: 32px; font-weight: 900; color: #0f172a; margin-bottom: 8px; }
+    .comm-title p { font-size: 15px; color: #64748b; }
+    .btn-write { background: #2563eb; color: #fff; border: none; padding: 12px 24px; border-radius: 999px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
+    .btn-write:hover { background: #1d4ed8; transform: translateY(-2px); }
+    .comm-tabs { display: flex; gap: 24px; border-bottom: 2px solid #e2e8f0; margin-bottom: 30px; }
+    .comm-tab { font-size: 18px; font-weight: 700; color: #94a3b8; padding-bottom: 14px; cursor: pointer; position: relative; transition: 0.2s; }
+    .comm-tab.active { color: #0f172a; }
+    .comm-tab.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px; background: #0f172a; border-radius: 3px 3px 0 0; }
+    
+    .feed-list { display: flex; flex-direction: column; gap: 30px; }
+    .feed-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 24px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); animation: fadeIn 0.4s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    .feed-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .author-info { display: flex; align-items: center; gap: 12px; }
+    .author-avatar { width: 44px; height: 44px; border-radius: 50%; background: #f1f5f9; display: flex; justify-content: center; align-items: center; color: #94a3b8; font-size: 20px; }
+    .author-details { display: flex; flex-direction: column; gap: 2px; }
+    .author-name { font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px; }
+    .badge-review { background: #dbeafe; color: #2563eb; font-size: 11px; padding: 3px 6px; border-radius: 4px; font-weight: 800;}
+    .badge-inquiry { background: #fee2e2; color: #ef4444; font-size: 11px; padding: 3px 6px; border-radius: 4px; font-weight: 800;}
+    .author-meta { font-size: 13px; color: #94a3b8; display: flex; align-items: center; gap: 10px; }
+    .feed-body { margin-bottom: 20px; }
+    .feed-text { font-size: 15px; line-height: 1.6; color: #334155; margin-bottom: 16px; white-space: pre-wrap; }
+    .feed-product-tag { display: inline-flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; font-weight: 600; color: #475569; }
+    .feed-actions { display: flex; gap: 16px; border-top: 1px solid #f1f5f9; padding-top: 16px; }
+    .action-btn { background: none; border: none; color: #64748b; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; padding: 0; }
+
+    .write-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 9999; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; }
+    .write-modal.active { display: flex; opacity: 1; }
+    .write-modal-container { width: 90%; max-width: 540px; background: #fff; border-radius: 24px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: slideUp 0.3s ease-out; }
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .write-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .write-header h2 { font-size: 20px; font-weight: 800; color: #0f172a; }
+    .write-close-btn { background: none; border: none; font-size: 24px; color: #94a3b8; cursor: pointer; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 14px; font-weight: 700; color: #334155; margin-bottom: 8px; }
+    .type-selector { display: flex; gap: 16px; }
+    .form-control { width: 100%; border: 1px solid #cbd5e1; padding: 14px 16px; border-radius: 12px; font-size: 15px; outline: none; font-family: inherit; box-sizing: border-box; }
+    textarea.form-control { resize: none; min-height: 120px; }
+    .write-footer { display: flex; gap: 12px; margin-top: 30px; }
+    .btn-cancel { flex: 1; background: #f1f5f9; color: #64748b; border: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; }
+    .btn-submit { flex: 2; background: #2563eb; color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+    <header class="header">
+        <div class="logo-wrap"><a href="index.html"><img class="logo-image" src="아라쇼로고.png" alt="아라쇼" /></a></div>
+        <ul class="nav-menu">
+            <li><a href="index.html"><i class="fa-solid fa-circle" style="font-size: 10px; color: #ef4444; margin-right: 4px;"></i>LIVE</a></li>
+            <li><a href="schedule.html">방송 편성표</a></li>
+            <li><a href="highlight.html">하이라이트</a></li>
+            <li><a href="product-info.html">상품정보영상</a></li>
+            <li class="active"><a href="community.html">커뮤니티</a></li>
+            <li><a href="vsindex.html">V스튜디오</a></li>
+        </ul>
+        <div class="header-icons"><i class="fa-solid fa-magnifying-glass"></i><i class="fa-solid fa-cart-shopping"></i><i class="fa-regular fa-user"></i></div>
+    </header>
+
+    <main class="community-wrapper">
+        <div class="comm-header">
+            <div class="comm-title">
+                <h1>아라쇼 커뮤니티</h1>
+                <p>고객님들의 생생한 리뷰와 문의를 확인하세요.</p>
+            </div>
+            <button class="btn-write" id="btnOpenWrite"><i class="fa-solid fa-pen"></i> 글쓰기</button>
+        </div>
+
+        <div class="comm-tabs" id="tabContainer">
+            <div class="comm-tab active" data-filter="all">전체보기</div>
+            <div class="comm-tab" data-filter="review">리뷰</div>
+            <div class="comm-tab" data-filter="inquiry">문의</div>
+        </div>
+
+        <div class="feed-list" id="feedList">
+            <div style="text-align: center; color: #94a3b8; padding: 40px;">데이터를 불러오는 중입니다...</div>
+        </div>
+    </main>
+</div>
+
+<!-- 글쓰기 모달 창 -->
+<div class="write-modal" id="writeModal">
+    <div class="write-modal-container">
+        <div class="write-header">
+            <h2>새 게시글 작성</h2>
+            <button class="write-close-btn" id="btnCloseWrite"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="write-body">
+            <div class="form-group">
+                <label>게시글 유형</label>
+                <div class="type-selector">
+                    <label><input type="radio" name="postType" value="review" checked> 리뷰</label>
+                    <label><input type="radio" name="postType" value="inquiry"> 문의</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>관련 상품 (선택)</label>
+                <input type="text" id="postProduct" class="form-control" placeholder="예: 실외기 받침대 세트">
+            </div>
+            <div class="form-group">
+                <label>내용 작성</label>
+                <textarea id="postContent" class="form-control" placeholder="궁금한 점이나 솔직한 리뷰를 남겨주세요."></textarea>
+            </div>
+        </div>
+        <div class="write-footer">
+            <button class="btn-cancel" id="btnCancelWrite">취소</button>
+            <button class="btn-submit" id="btnSubmitWrite">등록하기</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    // ✨ 주신 진짜 키값으로 업데이트!
+    const firebaseConfig = {
+        apiKey: "AIzaSyCFhPO1Ttt1mZJ2DWU5R6yuLx3r9_L7mPI",
+        authDomain: "isvmlivepage.firebaseapp.com",
+        projectId: "isvmlivepage",
+        storageBucket: "isvmlivepage.firebasestorage.app",
+        messagingSenderId: "447061552997",
+        appId: "1:447061552997:web:d5b4fd5d148e93b81e7b8c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // ==========================================
+    // 글쓰기 모달 제어
+    // ==========================================
+    const writeModal = document.getElementById('writeModal');
+    
+    document.getElementById('btnOpenWrite').addEventListener('click', () => {
+        writeModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+    
+    const closeModal = () => {
+        writeModal.classList.remove('active');
+        document.body.style.overflow = '';
+    };
+    document.getElementById('btnCloseWrite').addEventListener('click', closeModal);
+    document.getElementById('btnCancelWrite').addEventListener('click', closeModal);
+
+    // ==========================================
+    // 새 글 작성 (DB에 저장)
+    // ==========================================
+    document.getElementById('btnSubmitWrite').addEventListener('click', async () => {
+        const contentEl = document.getElementById('postContent');
+        const productEl = document.getElementById('postProduct');
+        const content = contentEl.value.trim();
+        
+        if (!content) return alert('내용을 작성해 주세요.');
+
+        const type = document.querySelector('input[name="postType"]:checked').value;
+        const product = productEl.value.trim();
+        
+        try {
+            await addDoc(collection(db, "posts"), {
+                type: type,
+                product: product,
+                content: content,
+                author: "방문자",
+                likes: 0,
+                createdAt: serverTimestamp() 
+            });
+            
+            contentEl.value = '';
+            productEl.value = '';
+            closeModal();
+            
+        } catch (error) {
+            console.error("게시글 저장 실패:", error);
+            alert("글을 저장하는 데 실패했습니다.");
+        }
+    });
+
+    // ==========================================
+    // DB에서 실시간 글 목록 불러오기
+    // ==========================================
+    const feedList = document.getElementById('feedList');
+    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+    
+    onSnapshot(q, (snapshot) => {
+        feedList.innerHTML = ''; 
+        
+        if(snapshot.empty) {
+            feedList.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:40px;">아직 작성된 글이 없습니다. 첫 번째 글을 남겨보세요!</div>';
+            return;
+        }
+
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const postId = doc.id;
+            
+            const badgeHtml = data.type === 'review' 
+                ? '<span class="badge-review">리뷰</span>' 
+                : '<span class="badge-inquiry">문의</span>';
+                
+            const productHtml = data.product 
+                ? `<div class="feed-product-tag"><i class="fa-solid fa-link"></i> ${data.product}</div>` 
+                : '';
+
+            const card = document.createElement('div');
+            card.className = 'feed-card';
+            card.setAttribute('data-type', data.type); 
+            
+            card.innerHTML = `
+                <div class="feed-header">
+                    <div class="author-info">
+                        <div class="author-avatar"><i class="fa-solid fa-user"></i></div>
+                        <div class="author-details">
+                            <div class="author-name">${data.author} ${badgeHtml}</div>
+                            <div class="author-meta"><span>방금 전</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="feed-body">
+                    ${productHtml}
+                    <div class="feed-text">${data.content}</div>
+                </div>
+                <div class="feed-actions">
+                    <button class="action-btn"><i class="fa-regular fa-heart"></i> <span>좋아요 ${data.likes || 0}</span></button>
+                </div>
+            `;
+            feedList.appendChild(card);
+        });
+        
+        applyFilter();
+    });
+
+    // ==========================================
+    // 탭 필터링
+    // ==========================================
+    let currentFilter = 'all';
+    
+    document.querySelectorAll('.comm-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            document.querySelectorAll('.comm-tab').forEach(t => t.classList.remove('active'));
+            e.target.classList.add('active');
+            currentFilter = e.target.getAttribute('data-filter');
+            applyFilter();
+        });
+    });
+
+    function applyFilter() {
+        document.querySelectorAll('.feed-card').forEach(card => {
+            if (currentFilter === 'all' || card.getAttribute('data-type') === currentFilter) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+</script>
+</body>
+</html>

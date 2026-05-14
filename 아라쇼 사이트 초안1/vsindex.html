@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V-Studio by 일신비츠온</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <style>
+        /* 기본 설정 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #fff;
+            color: #111;
+        }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; padding: 0; margin: 0; }
+
+        /* ========================================= */
+        /* ✨ 아라쇼 공통 상단 헤더 스타일 적용 ✨ */
+        /* ========================================= */
+        .header {
+            height: 82px;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e2e8f0;
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+        }
+        .logo-image {
+            height: 42px;
+            width: auto;
+            display: block;
+        }
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            gap: 40px;
+        }
+        .nav-menu li {
+            font-size: 15px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+        }
+/* 변경 전 (파란색) -> 변경 후 (빨간색) */
+.nav-menu li.active {
+    color: #ef4444; 
+}
+.nav-menu li:hover {
+    color: #ef4444;
+}
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .header-icons i {
+            font-size: 18px;
+            color: #334155;
+            cursor: pointer;
+        }
+
+        /* ========================================= */
+        /* V-Studio 메인 컨텐츠 영역 */
+        /* ========================================= */
+        .hero-banner {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background-image: url('https://www.elle.co.kr/resources_old/online/org_online_image/el/3364958d-89de-4f1a-8ff5-f730f6ccc826.jpg'); 
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start; 
+            text-align: left; 
+            padding-left: 10%; 
+            box-sizing: border-box;
+        }
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.45); 
+            z-index: 1;
+        }
+        .hero-text {
+            position: relative;
+            z-index: 2;
+            padding: 0; 
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.9);
+        }
+        .hero-text h1 {
+            font-size: 42px; 
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: #ffffff; 
+        }
+        .hero-text p {
+            font-size: 17px;
+            line-height: 1.6;
+            max-width: 600px; 
+            margin: 0; 
+            color: #ffffff; 
+            font-weight: 400;
+        }
+
+        .magazine-section {
+            max-width: 800px;
+            margin: 80px auto 40px auto; 
+            padding: 0 30px;
+            text-align: center;
+        }
+        .magazine-section h2 {
+            font-family: 'Noto Sans KR', sans-serif; 
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+            color: #111;
+        }
+        .magazine-section p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #444;
+            margin-bottom: 24px;
+            word-break: keep-all; 
+        }
+
+        .section-divider {
+            display: block;
+            width: 40px;
+            height: 2px;
+            background-color: #111;
+            margin: 80px auto 0 auto; 
+            border: none;
+        }
+
+        .showroom-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px; 
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+        
+        .vr-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3; 
+            background-color: #f5f5f5;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+
+        .vr-wrapper:not(.large) {
+            cursor: pointer;
+        }
+
+        .vr-wrapper.large {
+            aspect-ratio: auto; 
+            height: 100%;
+            cursor: default; 
+        }
+
+        .vr-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            border: none;
+            transition: transform 0.3s ease; 
+        }
+
+        .vr-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            box-sizing: border-box;
+            border: 4px solid transparent;
+            pointer-events: none; 
+            transition: border-color 0.2s ease;
+            z-index: 10;
+        }
+        
+        .vr-wrapper:not(.large):hover::after {
+            border-color: #fbd914; 
+        }
+        .vr-wrapper:not(.large):hover img {
+            transform: scale(1.05); 
+        }
+
+        .vr-wrapper iframe {
+            position: absolute;
+            width: 115%; 
+            height: 115%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); 
+            border: none;
+        }
+
+        .grid-left-main .item-main { grid-area: 1 / 1 / 3 / 3; } 
+        .grid-left-main .item-1    { grid-area: 1 / 3 / 2 / 4; } 
+        .grid-left-main .item-2    { grid-area: 1 / 4 / 2 / 5; } 
+        .grid-left-main .item-3    { grid-area: 2 / 3 / 3 / 4; } 
+        .grid-left-main .item-4    { grid-area: 2 / 4 / 3 / 5; } 
+
+        .grid-right-main .item-1    { grid-area: 1 / 1 / 2 / 2; } 
+        .grid-right-main .item-2    { grid-area: 1 / 2 / 2 / 3; } 
+        .grid-right-main .item-main { grid-area: 1 / 3 / 3 / 5; } 
+        .grid-right-main .item-3    { grid-area: 2 / 1 / 3 / 2; } 
+        .grid-right-main .item-4    { grid-area: 2 / 2 / 3 / 3; } 
+
+        .mb-80 { margin-bottom: 80px; }
+
+        /* 이미지 팝업(모달) */
+        .image-modal {
+            display: none; 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); 
+            z-index: 9999; 
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease; 
+        }
+
+        .image-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90vh; 
+            animation: zoomIn 0.3s ease-out; 
+        }
+
+        .modal-content img {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 8px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            display: block;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: #fff;
+            font-size: 35px;
+            font-weight: 300;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #fbd914; 
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* 모바일 반응형 */
+        @media (max-width: 960px) {
+            .header {
+                height: 64px;
+                padding: 0 16px;
+            }
+            .nav-menu {
+                display: none; /* 모바일에서는 메뉴 숨김 처리 */
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-banner { align-items: flex-start; padding-left: 20px; }
+            .hero-text h1 { font-size: 32px; }
+            .showroom-grid { grid-template-columns: 1fr; }
+            .vr-wrapper, .vr-wrapper.large { aspect-ratio: 1 / 1; }
+            .magazine-section { margin: 60px auto 30px auto; padding: 0 20px; }
+            .section-divider { margin-top: 60px; }
+            
+            .grid-left-main .item-main, .grid-left-main .item-1, .grid-left-main .item-2, .grid-left-main .item-3, .grid-left-main .item-4,
+            .grid-right-main .item-main, .grid-right-main .item-1, .grid-right-main .item-2, .grid-right-main .item-3, .grid-right-main .item-4 {
+                grid-area: auto;
+                grid-column: 1 / -1; 
+            }
+            .close-btn { top: -45px; right: 10px; font-size: 40px; }
+        }
+/* V스튜디오 전용 텍스트 로고 스타일 */
+        .vstudio-logo-text {
+            font-size: 24px;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .v-point {
+            color: #ef4444; /* 상단 메뉴와 통일된 빨간색 */
+            font-size: 28px;
+            margin-right: 4px;
+            font-family: 'Poppins', sans-serif; /* 영문은 세련된 폰트로 */
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+<div class="logo-wrap">
+            <a href="vsindex.html">
+                <img class="logo-image" src="vs로고.png" alt="V스튜디오" />
+            </a>
+        </div>
+<ul class="nav-menu">
+    <li><a href="index.html"><i class="fa-solid fa-circle" style="font-size: 10px; color: #ef4444; margin-right: 4px;"></i>LIVE</a></li>
+    <li><a href="schedule.html">방송 편성표</a></li>
+    <li><a href="highlight.html">하이라이트</a></li>
+    <li><a href="product-info.html">상품정보영상</a></li>
+    <li><a href="community.html">커뮤니티</a></li>
+    <li class="active"><a href="vsindex.html">V스튜디오</a></li>
+</ul>
+        <div class="header-icons">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <i class="fa-solid fa-cart-shopping"></i>
+            <i class="fa-regular fa-user"></i>
+        </div>
+    </header>
+
+    <section class="hero-banner">
+        <div class="hero-text">
+            <h1>전문가의 시선으로 완성된 공간 뷰</h1>
+            <p>일신비츠온의 제품이 적용된 가상의 인테리어를 3D 투어로 생생하게 탐색해 보세요.<br>마우스를 드래그하여 360도로 공간을 둘러보고 숨겨진 아이디어를 발견할 수 있습니다.</p>
+        </div>
+    </section>
+
+    <section class="magazine-section">
+        <h2>홈인테리어</h2>
+        <p>가장 편안해야 할 나만의 공간, 집. 빛의 온도와 섬세하게 배치된 소품들이 어우러져 일상의 피로를 녹이는 아늑한 분위기를 완성합니다.</p>
+        <p>일신비츠온이 제안하는 홈인테리어 룸셋은 모던한 실링팬부터 은은한 다운라이트까지, 공간의 품격을 높이는 다양한 조명 솔루션을 보여줍니다.</p>
+    </section>
+
+    <section class="showroom-grid grid-left-main">
+        <div class="vr-wrapper large item-main">
+            <iframe src="https://orbitvu.co/share/8hXkzRMJFwpqqi9NgxxE7e/225323/orbittour/view" allow="fullscreen; vr"></iframe>
+        </div>
+        <div class="vr-wrapper item-1">
+            <img src="https://vitsonimg.co.kr/images/productsNew/157/157637-1.jpg" alt="">
+        </div>
+        <div class="vr-wrapper item-2">
+            <img src="https://vitsonimg.co.kr/images/productsNew/371/371467-2.jpg" alt="">
+        </div>
+        <div class="vr-wrapper item-3">
+            <img src="https://vitsonimg.co.kr/images/productsNew/528/528688-1.jpg" alt="">
+        </div>
+        <div class="vr-wrapper item-4">
+            <img src="https://vitsonimg.co.kr/images/productsNew/412/412222-1.jpg" alt="">
+        </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <section class="magazine-section">
+        <h2>오피스</h2>
+        <p>현대의 오피스는 단순한 업무 공간을 넘어, 구성원의 창의성과 생산성이 교차하는 역동적인 무대입니다. 잘 설계된 업무 환경은 유연한 소통을 이끌어내며 기업의 혁신을 가속화합니다.</p>
+        <p>일신비츠온이 선보이는 오피스 룸셋은 눈의 피로를 덜어주는 부드러운 빛부터 휴게 공간의 활력을 더하는 섬세한 디테일까지, 업무 효율을 높이는 모든 솔루션을 제안합니다.</p>
+    </section>
+
+    <section class="showroom-grid grid-right-main">
+        <div class="vr-wrapper item-1">
+            <img src="https://vitsonimg.co.kr/images/productsNew/199/1%20(1).jpg" alt="">
+        </div>
+        <div class="vr-wrapper item-2">
+            <img src="https://vitsonimg.co.kr/images/productsNew/233/233390.png" alt="">
+        </div>
+        <div class="vr-wrapper large item-main">
+            <iframe src="https://orbitvu.co/share/CmQd2gbRyH7S8CjghgTxBE/225475/orbittour/view" allow="fullscreen; vr"></iframe>
+        </div>
+        <div class="vr-wrapper item-3">
+            <img src="https://vitsonimg.co.kr/images/productsNew/233/233390%20(2).jpg" alt="">
+        </div>
+        <div class="vr-wrapper item-4">
+            <img src="https://vitsonimg.co.kr/images/productsNew/199/199917.JPG" alt="">
+        </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <section class="magazine-section">
+        <h2>생활공간</h2>
+        <p>우리의 일상은 집과 사무실 밖에서도 계속됩니다. 여유로운 공원 산책, 상업 시설의 쾌적함, 사계절의 변화를 마주하는 모든 순간들이 바로 우리의 생활공간입니다.</p>
+        <p>야외 조경 관리부터 상업 공간의 유지 보수까지, 일신비츠온의 다목적 생활 장비들이 평범한 일상을 어떻게 더 편리하고 쾌적하게 지원하는지 가상 현실에서 만나보세요.</p>
+    </section>
+
+    <section class="showroom-grid grid-left-main">
+        <div class="vr-wrapper large item-main">
+            <iframe src="https://orbitvu.co/share/SvoEdYhkri3URixUK2gLbZ/225359/orbittour/view" allow="fullscreen; vr"></iframe>
+        </div>
+        <div class="vr-wrapper item-1">
+            <img src="https://vitsonimg.co.kr/images/productsNew/112/112134-2.jpg" alt="">
+        </div>
+        <div class="vr-wrapper item-2">
+            <img src="https://vitsonimg.co.kr/images/productsNew/112/112134%20(3).jpg" alt="">
+        </div>
+        <div class="vr-wrapper item-3">
+            <img src="https://vitsonimg.co.kr/images/productsNew/544/544032.jpg" alt="">
+        </div>
+        <div class="vr-wrapper item-4">
+            <img src="https://vitsonimg.co.kr/images/productsNew/410/410333-1.jpg" alt="">
+        </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <section class="magazine-section">
+        <h2>현장</h2>
+        <p>안전과 효율이 최우선시되는 산업 현장. 거친 환경 속에서도 흔들림 없는 내구성과 작업자의 편의를 고려한 전문 장비의 배치는 필수적입니다.</p>
+        <p>현장의 환기를 책임지는 대형 환풍기부터 정밀한 마감 공구를 아우르는 일신비츠온의 MRO 라인업을 통해, 프로페셔널을 위한 최적의 작업 환경을 경험해 보세요.</p>
+    </section>
+
+    <section class="showroom-grid grid-right-main mb-80">
+        <div class="vr-wrapper item-1">
+            <img src="https://vitsonimg.co.kr/images/productsNew/236/236755.png" alt="">
+        </div>
+        <div class="vr-wrapper item-2">
+            <img src="https://vitsonimg.co.kr/images/productsNew/MD_1_20220307/79367.png" alt="">
+        </div>
+        <div class="vr-wrapper large item-main">
+            <iframe src="https://orbitvu.co/share/f7mArBUtrpRr3eEZUrr6cA/225476/orbittour/view" allow="fullscreen; vr"></iframe>
+        </div>
+        <div class="vr-wrapper item-3">
+            <img src="https://vitsonimg.co.kr/images/productsNew/MD_1_20220307/241882.png" alt="">
+        </div>
+        <div class="vr-wrapper item-4">
+            <img src="https://vitsonimg.co.kr/images/productsNew/MD_1_20220307/79360.png" alt="">
+        </div>
+    </section>
+
+    <div id="imageModal" class="image-modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close-btn">&times;</span>
+            <img id="modalImg" src="" alt="확대된 원본 이미지">
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImg');
+            const closeBtn = document.getElementById('closeModal');
+            
+            const thumbnailWrappers = document.querySelectorAll('.vr-wrapper:not(.large)');
+            
+            thumbnailWrappers.forEach(wrapper => {
+                wrapper.addEventListener('click', function() {
+                    const img = this.querySelector('img'); 
+                    if(img) {
+                        modalImg.src = img.src; 
+                        modal.classList.add('active'); 
+                        document.body.style.overflow = 'hidden'; 
+                    }
+                });
+            });
+
+            const closeModalFunc = () => {
+                modal.classList.remove('active');
+                document.body.style.overflow = ''; 
+                setTimeout(() => { modalImg.src = ''; }, 300);
+            };
+
+            closeBtn.addEventListener('click', closeModalFunc);
+
+            modal.addEventListener('click', function(e) {
+                if (e.target !== modalImg) {
+                    closeModalFunc();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    closeModalFunc();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
